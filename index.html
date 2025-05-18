@@ -43,29 +43,34 @@
   </form>
 
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxACATd35YLIEFc5YtY5Z1Wu62iyV35Ni2_wqcAkMd3nx7uEh3R4NqTFoWBig8CtDk1/exec'; // <-- Replace with your Apps Script Web App URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxACATd35YLIEFc5YtY5Z1Wu62iyV35Ni2_wqcAkMd3nx7uEh3R4NqTFoWBig8CtDk1/exec'; // ✅ Use your actual Web App URL
 
-    // Track mouse hover positions
+    // 👉 Throttle hover events to 1 request per 2 seconds (to reduce traffic)
+    let lastSent = 0;
     document.addEventListener('mousemove', function(event) {
-      const hoverData = {
-        type: 'hover',
-        x: event.clientX,
-        y: event.clientY,
-        timestamp: new Date().toISOString()
-      };
+      const now = Date.now();
+      if (now - lastSent > 2000) {
+        const hoverData = {
+          type: 'hover',
+          x: event.clientX,
+          y: event.clientY,
+          timestamp: new Date().toISOString()
+        };
 
-      fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(hoverData)
-      }).catch(() => {}); // Ignore errors in no-cors mode
+        fetch(scriptURL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(hoverData)
+        }).catch(() => {});
+
+        lastSent = now;
+      }
     });
 
-    // Handle form submission
+    // ✅ Handle form submission
     document.getElementById('userForm').addEventListener('submit', function(event) {
       event.preventDefault();
-
       const form = event.target;
       const formData = {
         type: 'form',
@@ -80,10 +85,10 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       }).then(() => {
-        alert('Thank you! Your data has been submitted.');
+        alert('✅ Thank you! Your data has been submitted.');
         form.reset();
       }).catch(() => {
-        alert('Oops! There was an issue submitting your data.');
+        alert('❌ Oops! Submission failed.');
       });
     });
   </script>
