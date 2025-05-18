@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lead Capture and Hover Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      max-width: 400px;
+      margin: auto;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    input, button {
+      padding: 0.7rem;
+      font-size: 1rem;
+    }
+    button {
+      cursor: pointer;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #004999;
+    }
+  </style>
+</head>
+<body>
+  <h2>Lead Capture Form</h2>
+
+  <form id="userForm">
+    <input type="text" name="name" placeholder="Enter your name" required />
+    <input type="email" name="email" placeholder="Enter your email" required />
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxACATd35YLIEFc5YtY5Z1Wu62iyV35Ni2_wqcAkMd3nx7uEh3R4NqTFoWBig8CtDk1/exec'; // <-- Replace with your Apps Script Web App URL
+
+    // Track mouse hover positions
+    document.addEventListener('mousemove', function(event) {
+      const hoverData = {
+        type: 'hover',
+        x: event.clientX,
+        y: event.clientY,
+        timestamp: new Date().toISOString()
+      };
+
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(hoverData)
+      }).catch(() => {}); // Ignore errors in no-cors mode
+    });
+
+    // Handle form submission
+    document.getElementById('userForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const form = event.target;
+      const formData = {
+        type: 'form',
+        name: form.name.value.trim(),
+        email: form.email.value.trim(),
+        timestamp: new Date().toISOString()
+      };
+
+      fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      }).then(() => {
+        alert('Thank you! Your data has been submitted.');
+        form.reset();
+      }).catch(() => {
+        alert('Oops! There was an issue submitting your data.');
+      });
+    });
+  </script>
+</body>
+</html>
